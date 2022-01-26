@@ -101,11 +101,15 @@ $("#go").on("click", function () {
 $("#text").
 	on("blur", function () {
 		index = 0;
+		var elCodes = document.getElementById("codes");
+		elCodes.innerHTML = '';
 		makeCode(0);
 	}).
 	on("keydown", function (e) {
 		if (e.keyCode == 13) {
 			index = 0;
+			var elCodes = document.getElementById("codes");
+			elCodes.innerHTML = '';
 			makeCode(0);
 		}
 	});
