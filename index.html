@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<head>
+<title>Cross-Browser QRCode generator for Javascript</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="qrcode.js"></script>
+</head>
+<body>
+<div style="display: flex;">
+	<textarea id="text" type="text" value="http://jindo.dev.naver.com/collie" style="width:150px"></textarea>
+	<div>
+		<div id="codes" style="width: 100%; height: 100%; display: flex; flex-wrap: wrap; ">
+		</div>
+		<div style="display: flex; justify-content: space-between;">
+			<button id="previous">Previous</button>
+			<div style="display: flex;">
+				<input id="page" style="width: 30px;"/>
+				<button id="go" style="margin-left: 10px;">Go</button>
+			</div>
+			<button id="next">Next</button>
+		</div>
+	</div>
+</div>
+
+<div id="qrcode" style="margin: 15px;"></div>
+<h4 id="owner" style=" margin: 0; margin-top: 5px; text-align: center; "></h4>
+
+<script type="text/javascript">
+
+function makeCode (_index) {		
+	var elText = document.getElementById("text");
+
+	if (!elText.value || elText.value.length < 1) {
+		return;
+	}
+
+	window.localStorage.setItem('sdts', elText.value);
+	
+	var lines = elText.value.split('\n');
+	var element = lines[_index];
+
+	var elCodes = document.getElementById("codes");
+	var elQRCode = document.getElementById("qrcode");
+	var elSdt = document.getElementById("owner");
+	
+	elCodes.innerHTML = '';
+
+	var data = `2|99|${element}|AHIHI|ahihi@gmail.com|0|0|100`;
+
+	var clElQrcode = elQRCode.cloneNode(true);
+	var clElSdt = elSdt.cloneNode(true);
+
+	var _qrcode = new QRCode(clElQrcode, {
+		width : 500,
+		height : 500
+	});		
+
+	_qrcode.makeCode(data);
+
+	clElSdt.textContent = element;
+	
+	clElQrcode.appendChild(clElSdt);
+	elCodes.appendChild(clElQrcode);
+
+	document.getElementById("page").value = _index;
+}
+
+var index = 0;
+
+function change(_index) {
+	window.localStorage.setItem('_index', _index);
+
+	var elCodes = document.getElementById("codes");
+	elCodes.innerHTML = '';
+	
+	var elText = document.getElementById("text");
+	var lines = elText.value.split('\n');
+
+	makeCode(Math.max(0, Math.min(_index, lines.length - 1)));
+}
+
+$("#previous").on("click", function () {
+	index--;
+	change(index);
+});
+
+$("#next").on("click", function () {
+	index++;
+	change(index);
+});
+
+$("#go").on("click", function () {
+	index = document.getElementById("page").value;
+	change(index);
+});
+
+$("#text").
+	on("blur", function () {
+		index = 0;
+		makeCode(0);
+	}).
+	on("keydown", function (e) {
+		if (e.keyCode == 13) {
+			index = 0;
+			makeCode(0);
+		}
+	});
+
+$( document ).ready(function() {    
+	var elText = document.getElementById("text");
+	var elCodes = document.getElementById("codes");
+
+	elText.value = window.localStorage.getItem('sdts');
+	index = window.localStorage.getItem('_index');
+	
+	change(index);
+});
+</script>
+</body>
