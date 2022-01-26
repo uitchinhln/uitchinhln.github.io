@@ -78,6 +78,8 @@ function change(_index) {
 	var elText = document.getElementById("text");
 	var lines = elText.value.split('\n');
 
+	index = Math.max(0, Math.min(_index, lines.length - 1));
+
 	makeCode(Math.max(0, Math.min(_index, lines.length - 1)));
 }
 
